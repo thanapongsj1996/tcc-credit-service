@@ -1,0 +1,33 @@
+name: Build Service credit
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node JS
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Check Version
+        run: |
+            npm --version
+            node --version
+
+      - name: Run Node
+        run: |
+             npm run build --if-present
+             npm run start
+
+      - name: Test Node
+        run: npm test
