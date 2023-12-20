@@ -13,11 +13,9 @@ export class RedisService {
     @Inject(CreditService)
     private creditService: CreditService,
   ) {
-    this.redisClient = new Redis({
-      port: 6379,
-      host: 'localhost',
-      db: 0,
-    });
+    this.redisClient = new Redis(
+      process.env.REDIS_URL || 'redis://localhost:6379',
+    );
   }
 
   onModuleInit() {
