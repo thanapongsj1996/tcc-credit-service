@@ -20,12 +20,24 @@ export class RedisService {
 
   onModuleInit() {
     this.subscribe('user_created');
+    this.subscribe('lotto_reward');
+    this.subscribe('lotto_purchase');
     this.redisClient.on('message', (channel, message) => {
       console.log('message: ', message);
       console.log('channel: ', channel);
 
       const { data } = JSON.parse(message);
-      this.creditService.saveNewUserCredit(data.id as string);
+      if (channel === 'user_created') {
+        this.creditService.saveNewUserCredit(data.id as string);
+      }
+
+      if (channel === 'lotto_reward') {
+        this.creditService.addCredit(data);
+      }
+
+      if (channel === 'lotto_purchase') {
+        this.creditService.deductCredit(data);
+      }
     });
   }
 

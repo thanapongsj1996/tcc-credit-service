@@ -47,4 +47,22 @@ export class CreditService {
   async getCreditByUserId(userId: string): Promise<UserCredit> {
     return this.userCreditModel.findOne({ userId }).exec();
   }
+
+  async addCredit(data: any[]): Promise<void> {
+    data.forEach(async (item) => {
+      const { userId, amount } = item;
+      await this.userCreditModel
+        .findOneAndUpdate({ userId }, { $inc: { credit: amount } })
+        .exec();
+    });
+  }
+
+  async deductCredit(data: any[]): Promise<void> {
+    data.forEach(async (item) => {
+      const { userId, amount } = item;
+      await this.userCreditModel
+        .findOneAndUpdate({ userId }, { $inc: { credit: -amount } })
+        .exec();
+    });
+  }
 }
