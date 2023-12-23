@@ -33,24 +33,25 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/tcc-credit-service:${{ github.sha }},${{ steps.meta.outputs.tags }},${{ secrets.DOCKER_USERNAME }}/tcc-credit-service:latest
+          tags: latest
           labels: ${{ steps.meta.outputs.labels }}
 
       # - name: Update K8s Deployment
       #   run: |
+      #     echo "commitId: ${{ github.sha }}"
       #     # Generate a new image tag using the environment variable
       #     image_with_new_tag="${{ secrets.DOCKER_USERNAME }}/tcc-credit-service:${{ github.sha }}"
 
       #     # Update the K8s deployment file using yq
       #     yq eval ".spec.template.spec.containers[0].image |= \"${image_with_new_tag}\"" -i ./manifest/dev/deployment.yaml
 
-      #     # Commit the changes
-      #     git config --local user.email "action@github.com"
+      #     # # Commit the changes
+      #     git config --local user.email "admin@github.com"
       #     git config --local user.name "GitHub Action"
-      #     git checkout develop
+      #     git checkout main
       #     git add ./manifest/dev/deployment.yaml
       #     git commit -m "Update image to ${image_with_new_tag}"
-      #     git push origin develop
+      #     git push origin main
 
       # - name: Setup gcloud CLI
       #   uses: google-github-actions/setup-gcloud@1bee7de035d65ec5da40a31f8589e240eba8fde5
@@ -67,11 +68,26 @@ jobs:
       # - name: Set up GKE credentials
       #   uses: google-github-actions/get-gke-credentials@v0
       #   with:
-      #     cluster_name: autopilot-cluster-1
+      #     cluster_name: tcc-lotto
       #     location: asia-southeast1
       #     project_id: ${{ secrets.GKE_PROJECT }}
       #     credentials: ${{ secrets.GKE_SA_KEY }}
 
       # - name: Deploy the Docker image to the GKE cluster
-      #   run: |-
-      #     kubectl apply -f ./manifest/dev
+      #   run: |
+      #     kubectl get ns
+      #     kubectl apply -f ./manifest/dev/deployment.yaml
+
+      # - name: Access K8s Cluster
+      #   env:
+      #     KUBECTL_CONFIG_CONTENT: ${{ secrets.K8S_CONFIG }} #suggest for variable multiple line
+      #   run: |
+      #     mkdir -p ~/.kube
+      #     echo "$KUBECTL_CONFIG_CONTENT" > ~/.kube/config
+      #     kubectl config current-context
+
+      # - name: Display yaml file
+      #   run: cat ./manifest/dev/deployment.yaml
+
+      # - name: Deploy Image to K8s
+      #   run: kubectl apply -f ./manifest/dev/. -n group-3-dev
